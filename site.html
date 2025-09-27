@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="pt-BR"> 
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Loja de Roupas</title> 
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+    body { background:#0a0a0a; color:#f5f5f5; display:flex; flex-direction:column; min-height:100vh; align-items:center; }
+
+    /* Logo */
+    .logo { display:flex; align-items:center; gap:10px; margin:20px 0; cursor:pointer; background:#1a1a1a; padding:10px 20px; border-radius:12px; box-shadow:0 0 15px #7d00ff66; }
+    .logo-icon { font-size:40px; }
+    .logo-text { font-size:32px; font-weight:bold; color:#bb86fc; text-transform: uppercase; transition:0.3s; }
+    .logo:hover .logo-text { color:#7d00ff; }
+
+    /* Navbar */
+    nav { display:flex; justify-content:center; background: linear-gradient(90deg,#3b0066,#7d00ff); padding:15px; gap:20px; flex-wrap:wrap; width:100%; }
+    nav a { color:#fff; text-decoration:none; font-weight:bold; font-size:1.1rem; padding:5px 15px; border-radius:5px; transition:0.3s; }
+    nav a:hover { background:#bb86fc; color:#000; }
+
+    /* Seções */
+    section { display:none; padding:20px; flex:1; width:100%; max-width:1200px; align-items:center; justify-content:center; flex-direction:column; }
+    section.active { display:flex; }
+
+    /* Filtros */
+    .filtros { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-bottom:30px; }
+    .filtros button { padding:10px 20px; border:none; border-radius:8px; background:#7d00ff; color:#fff; cursor:pointer; font-weight:bold; transition:0.3s; }
+    .filtros button:hover { background:#bb86fc; color:#000; }
+
+    /* Catálogo */
+    .catalogo { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:25px; justify-items:center; width:100%; }
+    .produto { background:#1a1a1a; border:2px solid #7d00ff; border-radius:12px; overflow:hidden; box-shadow:0 0 15px #7d00ff66; transition:transform 0.3s; width:100%; max-width:250px; display:flex; flex-direction:column; align-items:center; }
+    .produto:hover { transform:scale(1.05); }
+    .produto img { width:100%; height:250px; object-fit:cover; }
+    .info { padding:15px; text-align:center; display:flex; flex-direction:column; align-items:center; }
+    .info h3 { color:#bb86fc; margin-bottom:6px; }
+    .info p { font-size:0.9rem; color:#ddd; text-align:center; margin-bottom:6px; }
+    .stock { font-size:0.9rem; color:#dcdcdc; margin-top:6px; }
+
+    /* Botão neon (para <button> também) */
+    .botao {
+      position: relative; display: inline-block; margin-top: 10px; padding: 12px 24px;
+      background: #111; color: #fff; text-decoration: none; border-radius: 12px; font-weight: bold; cursor: pointer; overflow: hidden; transition: color 0.3s; z-index: 0; border: none;
+    }
+    .botao::before {
+      content: ""; position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px;
+      background: linear-gradient(270deg, #7d00ff, #bb86fc, #7d00ff, #bb86fc);
+      background-size: 300% 300%; border-radius: 14px; z-index: -1; animation: neonMove 4s linear infinite;
+    }
+    .botao::after {
+      content: ""; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px;
+      background: #111; border-radius: 10px; z-index: -1;
+    }
+    .botao:hover { color:#bb86fc; }
+    @keyframes neonMove {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Checkout e login */
+    .checkout-box, .login-box { max-width:400px; width:90%; margin:auto; padding:30px; background:#1a1a1a; border:2px solid #7d00ff; border-radius:12px; text-align:center; box-shadow:0 0 20px #7d00ff66; display:flex; flex-direction:column; align-items:center; }
+    .checkout-box input, .login-box input { width:100%; padding:12px; margin:10px 0; border-radius:8px; border:none; background:#0f0f0f; color:#fff; }
+    .checkout-box h3, .login-box h2 { margin-bottom:20px; color:#bb86fc; }
+    .whatsapp, .login-box button { display:inline-block; padding:12px 20px; margin-top:15px; background:#25D366; color:#fff; font-weight:bold; text-decoration:none; border-radius:10px; cursor:pointer; transition:0.3s; }
+    .whatsapp:hover { background:#128C7E; }
+    .login-box button:hover { background:#bb86fc; color:#000; }
+
+    @media(max-width:600px){
+      .catalogo { grid-template-columns:1fr; }
+      nav { flex-direction:column; gap:10px; }
+      .botao { width:100%; text-align:center; }
+    }
+  </style> 
+ </head> 
+ <body> <!-- Logo --> 
+  <div class="logo"> <span class="logo-icon">👕</span> <span class="logo-text">Coisasdemichelle</span> 
+  </div> <!-- Navbar (sem onclick inline) --> 
+  <nav> <a href="#" data-target="produtos">Produtos</a> <a href="#" data-target="checkout">Checkout</a> <a href="#" data-target="login">Login</a> 
+  </nav> <!-- Filtros --> 
+  <section id="produtos" class="active"> 
+   <h1>Vitrine de Roupas</h1> 
+   <div class="filtros"> <button data-cat="all">Todos</button> <button data-cat="camisetas">Camisetas</button> <button data-cat="calcas">Calças</button> <button data-cat="acessorios">Acessórios</button> 
+   </div> <!-- Catálogo: vários produtos com mesmo nome (cada um tem data-sku e estoque) --> 
+   <div class="catalogo" id="catalogo"> <!-- Camisetas (vários com mesmo nome "Camiseta 1") --> 
+    <div class="produto" data-category="camisetas" data-sku="cam1-1" data-name="Camiseta 1" data-price="50" data-stock="5"> 
+     <img src="https://via.placeholder.com/250x250/7d00ff/fff?text=Camiseta+1" alt="Camiseta 1"> 
+     <div class="info"> 
+      <h3>Camiseta 1</h3> 
+      <p>Algodão premium, unissex.</p> 
+      <p class="stock">Em estoque: <span class="stock-count">5</span></p> <button class="botao" data-sku="cam1-1">Adicionar</button> 
+     </div> 
+    </div> 
+    <div class="produto" data-category="camisetas" data-sku="cam1-2" data-name="Camiseta 1" data-price="50" data-stock="3"> 
+     <img src="https://via.placeholder.com/250x250/7d00ff/fff?text=Camiseta+1" alt="Camiseta 1"> 
+     <div class="info"> 
+      <h3>Camiseta 1</h3> 
+      <p>Algodão premium, unissex.</p> 
+      <p class="stock">Em estoque: <span class="stock-count">3</span></p> <button class="botao" data-sku="cam1-2">Adicionar</button> 
+     </div> 
+    </div> 
+    <div class="produto" data-category="camisetas" data-sku="cam1-3" data-name="Camiseta 1" data-price="50" data-stock="2"> 
+     <img src="https://via.placeholder.com/250x250/7d00ff/fff?text=Camiseta+1" alt="Camiseta 1"> 
+     <div class="info"> 
+      <h3>Camiseta 1</h3> 
+      <p>Algodão premium, unissex.</p> 
+      <p class="stock">Em estoque: <span class="stock-count">2</span></p> <button class="botao" data-sku="cam1-3">Adicionar</button> 
+     </div> 
+    </div> 
+    <div class="produto" data-category="camisetas" data-sku="cam1-4" data-name="Camiseta 1" data-price="50" data-stock="0"> 
+     <img src="https://via.placeholder.com/250x250/7d00ff/fff?text=Camiseta+1" alt="Camiseta 1"> 
+     <div class="info"> 
+      <h3>Camiseta 1</h3> 
+      <p>Algodão premium, unissex.</p> 
+      <p class="stock">Em estoque: <span class="stock-count">0</span></p> <button class="botao" data-sku="cam1-4">Adicionar</button> 
+     </div> 
+    </div> <!-- Calças --> 
+    <div class="produto" data-category="calcas" data-sku="cal1-1" data-name="Calça 1" data-price="120" data-stock="4"> 
+     <img src="https://via.placeholder.com/250x250/7d00ff/fff?text=Calca+1" alt="Calça 1"> 
+     <div class="info"> 
+      <h3>Calça 1</h3> 
+      <p>Jeans confortável e moderno.</p> 
+      <p class="stock">Em estoque: <span class="stock-count">4</span></p> <button class="botao" data-sku="cal1-1">Adicionar</button> 
+     </div> 
+    </div> 
+    <div class="produto" data-category="calcas" data-sku="cal1-2" data-name="Calça 1" data-price="120" data-stock="1"> 
+     <img src="https://via.placeholder.com/250x250/7d00ff/fff?text=Calca+1" alt="Calça 1"> 
+     <div class="info"> 
+      <h3>Calça 1</h3> 
+      <p>Jeans confortável e moderno.</p> 
+      <p class="stock">Em estoque: <span class="stock-count">1</span></p> <button class="botao" data-sku="cal1-2">Adicionar</button> 
+     </div> 
+    </div> 
+    <div class="produto" data-category="calcas" data-sku="cal1-3" data-name="Calça 1" data-price="120" data-stock="2"> 
+     <img src="https://via.placeholder.com/250x250/7d00ff/fff?text=Calca+1" alt="Calça 1"> 
+     <div class="info"> 
+      <h3>Calça 1</h3> 
+      <p>Jeans confortável e moderno.</p> 
+      <p class="stock">Em estoque: <span class="stock-count">2</span></p> <button class="botao" data-sku="cal1-3">Adicionar</button> 
+     </div> 
+    </div> <!-- Acessórios --> 
+    <div class="produto" data-category="acessorios" data-sku="acc1-1" data-name="Boné 1" data-price="35" data-stock="6"> 
+     <img src="https://via.placeholder.com/250x250/7d00ff/fff?text=Bone+1" alt="Boné 1"> 
+     <div class="info"> 
+      <h3>Boné 1</h3> 
+      <p>Estilo streetwear.</p> 
+      <p class="stock">Em estoque: <span class="stock-count">6</span></p> <button class="botao" data-sku="acc1-1">Adicionar</button> 
+     </div> 
+    </div> 
+    <div class="produto" data-category="acessorios" data-sku="acc1-2" data-name="Boné 1" data-price="35" data-stock="0"> 
+     <img src="https://via.placeholder.com/250x250/7d00ff/fff?text=Bone+1" alt="Boné 1"> 
+     <div class="info"> 
+      <h3>Boné 1</h3> 
+      <p>Estilo streetwear.</p> 
+      <p class="stock">Em estoque: <span class="stock-count">0</span></p> <button class="botao" data-sku="acc1-2">Adicionar</button> 
+     </div> 
+    </div> 
+    <div class="produto" data-category="acessorios" data-sku="acc1-3" data-name="Boné 1" data-price="35" data-stock="2"> 
+     <img src="https://via.placeholder.com/250x250/7d00ff/fff?text=Bone+1" alt="Boné 1"> 
+     <div class="info"> 
+      <h3>Boné 1</h3> 
+      <p>Estilo streetwear.</p> 
+      <p class="stock">Em estoque: <span class="stock-count">2</span></p> <button class="botao" data-sku="acc1-3">Adicionar</button> 
+     </div> 
+    </div> 
+   </div> 
+  </section> <!-- Checkout --> 
+  <section id="checkout"> 
+   <div class="checkout-box"> 
+    <h3>Itens Selecionados:</h3> 
+    <ul id="cart-list"></ul> 
+    <h2>Total: R$ <span id="cart-total">0.00</span></h2> 
+    <input type="text" id="client-name" placeholder="Seu nome"> <a class="whatsapp" id="whatsapp-link" target="_blank" rel="noopener">Comprar pelo WhatsApp</a> 
+   </div> 
+  </section> <!-- Login --> 
+  <section id="login"> 
+   <div class="login-box"> 
+    <h2>Login</h2> 
+    <input type="text" placeholder="Usuário"> 
+    <input type="password" placeholder="Senha"> <button>Entrar</button> 
+   </div> 
+  </section> <!-- SCRIPT: no final do body --> 
+  <script>
+    // estado do carrinho: array de {sku, name, price, qty}
+    let cart = [];
+
+    // função para alternar seções (visível globalmente)
+    function showSection(id){
+      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+      const sec = document.getElementById(id);
+      if (sec) sec.classList.add('active');
+    }
+
+    // tornar addToCart disponível globalmente (evita ReferenceError se houver chamadas inline)
+    window.addToCart = function(sku, name, price){
+      addToCartInternal(sku, name, price);
+    };
+
+    // implementação interna real
+    function addToCartInternal(sku, name, price) {
+      const produto = document.querySelector(`.produto[data-sku="${sku}"]`);
+      if (!produto) return;
+      let stock = Number(produto.dataset.stock) || 0;
+      if (stock <= 0) {
+        alert('Produto sem estoque.');
+        refreshStockUI(produto);
+        return;
+      }
+      // decrementar estoque
+      stock -= 1;
+      produto.dataset.stock = String(stock);
+      refreshStockUI(produto);
+
+      // adiciona/atualiza no carrinho por SKU
+      const item = cart.find(i => i.sku === sku);
+      if (item) item.qty += 1;
+      else cart.push({ sku, name: name || produto.dataset.name, price: Number(price || produto.dataset.price), qty: 1 });
+
+      updateCart();
+      showSection('checkout');
+    }
+
+    // atualizar UI do estoque para um produto
+    function refreshStockUI(produtoElem) {
+      const countSpan = produtoElem.querySelector('.stock-count');
+      const stock = Number(produtoElem.dataset.stock) || 0;
+      if (countSpan) countSpan.textContent = stock;
+      const btn = produtoElem.querySelector('.botao');
+      if (btn) {
+        if (stock <= 0) { btn.textContent = 'Esgotado'; btn.disabled = true; btn.style.cursor = 'not-allowed'; }
+        else { btn.textContent = 'Adicionar'; btn.disabled = false; btn.style.cursor = 'pointer'; }
+      }
+    }
+
+    function refreshStockUIAll() {
+      document.querySelectorAll('.produto').forEach(p => refreshStockUI(p));
+    }
+
+    // atualiza lista do carrinho, total e link do WhatsApp
+    function updateCart(){
+      const list = document.getElementById('cart-list');
+      const totalEl = document.getElementById('cart-total');
+      if (!list || !totalEl) return;
+      list.innerHTML = '';
+      let sum = 0;
+      cart.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.name} (x${item.qty}) - R$${(item.price * item.qty).toFixed(2)}`;
+        list.appendChild(li);
+        sum += item.price * item.qty;
+      });
+      totalEl.textContent = sum.toFixed(2);
+
+      const nameInput = document.getElementById('client-name') ? document.getElementById('client-name').value : 'Cliente';
+      const lines = cart.map(i => `${i.name} (SKU:${i.sku}) x${i.qty} => R$${(i.price*i.qty).toFixed(2)}`);
+      const message = `Olá, meu nome é ${nameInput}. Gostaria de comprar:\n${lines.join('\n')}\nTotal: R$${sum.toFixed(2)}`;
+      const encoded = encodeURIComponent(message);
+      const whatsappNumber = '5542999722744'; // substitua pelo seu número
+      const linkEl = document.getElementById('whatsapp-link');
+      if (linkEl) linkEl.href = `https://wa.me/${whatsappNumber}?text=${encoded}`;
+    }
+
+    // delegação de evento para botões "Adicionar"
+    const catalogEl = document.getElementById('catalogo');
+    if (catalogEl) {
+      catalogEl.addEventListener('click', function(e){
+        const btn = e.target.closest('.botao');
+        if (!btn) return;
+        const sku = btn.dataset.sku;
+        const produto = document.querySelector(`.produto[data-sku="${sku}"]`);
+        if (!produto) return;
+        const name = produto.dataset.name;
+        const price = Number(produto.dataset.price);
+        addToCartInternal(sku, name, price);
+      });
+    }
+
+    // navegação do topo (sem inline onclick)
+    document.querySelectorAll('nav a[data-target]').forEach(a => {
+      a.addEventListener('click', function(e){
+        e.preventDefault();
+        showSection(a.dataset.target);
+      });
+    });
+
+    // filtros
+    function filterProducts(cat='all') {
+      document.querySelectorAll('.produto').forEach(p => {
+        const category = p.dataset.category;
+        const matchesCategory = (cat === 'all' || category === cat);
+        p.style.display = matchesCategory ? 'flex' : 'none';
+      });
+    }
+    document.querySelectorAll('.filtros [data-cat]').forEach(btn => {
+      btn.addEventListener('click', () => filterProducts(btn.dataset.cat));
+    });
+
+    // input do cliente atualiza cart (mensagem)
+    const clientNameEl = document.getElementById('client-name');
+    if (clientNameEl) clientNameEl.addEventListener('input', updateCart);
+
+    // inicializa UI
+    refreshStockUIAll();
+    filterProducts('all');
+    updateCart();
+
+    // expor para debug (opcional)
+    window._cart = cart;
+    window._refreshStockUIAll = refreshStockUIAll;
+  </script> 
+ </body>
+</html>
